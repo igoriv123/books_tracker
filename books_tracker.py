@@ -115,7 +115,34 @@ def show_author_statistics(books):
     print("----------------------------------------")
 
 def delete_book(books):
-    pass
+    if not books:
+        print("\n Список пуст, удалять нечего.")
+        return
+        
+    show_all_books(books)
+    
+    while True:
+        try:
+            index_to_delete = input("\n Введите номер книги, которую хотите удалить (или 'отмена'): ")
+            if index_to_delete.lower() == 'отмена':
+                return
+
+            index = int(index_to_delete) - 1
+            if 0 <= index < len(books):
+                removed_book = books[index]
+                confirm = input(f"Вы уверены, что хотите удалить '{removed_book['title']}' от {removed_book['author']}? (да/нет): ").lower()
+                if confirm == 'да':
+                    deleted_book = books.pop(index)
+                    save_books(books)
+                    print(f"\n Книга '{deleted_book['title']}' успешно удалена.")
+                    return
+                else:
+                    print("Удаление отменено.")
+                    return
+            else:
+                print("Пожалуйста, введите корректный номер книги.")
+        except ValueError:
+            print("Некорректный ввод. Попробуйте снова.")
 
 def display_menu():
     print('=============================')
