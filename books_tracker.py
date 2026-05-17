@@ -56,7 +56,7 @@ def add_book(books):
             print("Некорректный ввод, ввдедите число от 1 до 5.")
 
     new_book = {
-        "autor": author,
+        "author": author,
         "title": title,
         "date_added": date_added,
         "rating": raiting_input
@@ -75,7 +75,7 @@ def show_all_books(books):
     print(f"{'Название':<30} | {'Автор':<20} | {'Оценка':<6} | {'Дата':<12}")
     print("-" * 75)
     for book in books:
-        print(f"{book['title'][:29]:<30} | {book['author'][:29]:<30} | {book['rating']:<6} | {book['date_read']:<12}")
+        print(f"{book['title'][:29]:<30} | {book['author'][:29]:<30} | {book['rating']:<6} | {book['date_added']:<12}")
     print("-" * 75)
 
 def show_average_rating(books):
@@ -114,6 +114,8 @@ def show_author_statistics(books):
         print(f"Автор: {author.capitalize():<15} | Книг: {count} | Средняя оценка: {average:.2f}")
     print("----------------------------------------")
 
+def delete_book(books):
+    pass
 
 def display_menu():
     print('=============================')
