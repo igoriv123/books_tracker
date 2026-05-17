@@ -1,19 +1,30 @@
 import os
 import json
-import datetime
+from datetime import datetime
 
 DATA_FILE = "books.json"
 
 def load_books():
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r") as file:
-            return json.load(file)
-    else:
+
+    if not os.path.exists(DATA_FILE):
+        return []
+    try:
+        with open(DATA_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        print("Ошибка чтения файла данных. Начинаем с пустым списком книг.")
+        return []
+    except Exception as e:
+        print(f"Произошла ошибка при загрузке данных: {e}")
         return []
 
 def save_books(books):
-    with open(DATA_FILE, "w") as f:
-        json.dump(books, f, indent=4, ensure_ascii=False)
+    try:
+        with open(DATA_FILE, "w", encoding='utf-8') as f:
+            json.dump(books, f, indent=4, ensure_ascii=False)
+    except Exception as e:
+        print(f"Ошибка при сохранении данных: {e}")
+
 
 
 def add_book(books):
@@ -28,15 +39,15 @@ def add_book(books):
             break
 
         try:
-            datetime.strftime(date_input)
-            date_added == date_input
+            datetime.strptime(date_input, "%Y-%m-%d")
+            date_added = date_input
             break
         except ValueError:
             print("Неправильный формат даты. Пожалуйста, используйте формат ГГГГ-ММ-ДД.")
 
     while True:
         try:
-            raiting_input = input("Введите рейтинг книги (1-5): ")
+            raiting_input = int(input("Введите рейтинг книги (1-5): ").strip())
             if 1 <= raiting_input <= 5:
                 break
             else:
@@ -52,9 +63,56 @@ def add_book(books):
     }
 
     books.append(new_book)
-    save_data(books)
+    save_books(books)
     print("\n Книга {title} успешно добавлена в библиотеку!")
 
+def show_all_books(books):
+    if not books:
+        print("\n Пока нет ни одной прочитанной книги.")
+        return
+
+    print("\n--- Список всех прочитанных книг ---")
+    print(f"{'Название':<30} | {'Автор':<20} | {'Оценка':<6} | {'Дата':<12}")
+    print("-" * 75)
+    for book in books:
+        print(f"{book['title'][:29]:<30} | {book['author'][:29]:<30} | {book['rating']:<6} | {book['date_read']:<12}")
+    print("-" * 75)
+
+def show_average_rating(books):
+    if not books:
+        print("\n Для расчета средней оценки нужно добавить книги.")
+        return
+
+    total_rating = sum(book['rating'] for book in books)
+    average = total_rating / len(books)
+    print(f"\n Общая средняя оценка всех книг: {average:.2f} из 5.0")
+
+def show_author_statistics(books):
+    if not books:
+        print("\n Нет данных для анализа авторов.")
+        return
+
+    author_ratings = {}
+    author_counts = {}
+
+    for book in books:
+        author = book['author'].lower()
+        rating = book['rating']
+        
+        if author not in author_ratings:
+            author_ratings[author] = 0
+            author_counts[author] = 0
+        
+        author_ratings[author] += rating
+        author_counts[author] += 1
+
+    print("\n Статистика по авторам:")
+    print("----------------------------------------")
+    for author, total_rating in author_ratings.items():
+        count = author_counts[author]
+        average = total_rating / count
+        print(f"Автор: {author.capitalize():<15} | Книг: {count} | Средняя оценка: {average:.2f}")
+    print("----------------------------------------")
 
 
 def display_menu():
@@ -71,22 +129,24 @@ def main():
 
     books = load_books()
 
-    choise = input('Выберите действие (1-6): ').strip()
+    while True:
+        display_menu()
+        choice = input('Выберите действие (1-6): ').strip()
 
-    if choise == '1':
-        add_book()
-    elif choise == '2':
-        show_all_books()
-    elif choise == '3':
-        show_average_rating()
-    elif choise == '4':
-        show_author_statistics()
-    elif choise == '5':
-        delete_book()
-    elif choise == '6':
-        break
-    else:
-        print('Неверный выбор. Попробуйте еще раз.')
+        if choice == '1':
+            add_book(books)
+        elif choice == '2':
+            show_all_books(books)
+        elif choice == '3':
+            show_average_rating(books)
+        elif choice == '4':
+            show_author_statistics(books)
+        elif choice == '5':
+            delete_book(books)
+        elif choice == '6':
+            break
+        else:
+            print('Неверный выбор. Попробуйте еще раз.')
 
 
 if __name__ == '__main__':
