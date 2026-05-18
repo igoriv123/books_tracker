@@ -31,6 +31,17 @@ def add_book(books):
     title = input("Введите название книги: ")
     author = input("Введите автора книги: ")
 
+    is_duplicate = False
+    for book in books:
+        if book['title'].lower() == title.lower() and book['author'].lower() == author.lower():
+            print("\n ВНИМАНИЕ: Книга с таким названием и автором уже существует в базе данных!\n")
+            is_duplicate = True
+            break
+            
+    if is_duplicate:
+        print("Добавление отменено.")
+        return
+
     while True:
         date_input = input('Введите дату прочтения книги (ГГГГ-ММ-ДД): ')
         if not date_input:
